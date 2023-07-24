@@ -1,0 +1,240 @@
+#--==--==--==--==--==--==--==--#
+#  ISEE3 ~ smit's I3 configs.  #
+#--==--==--==--==--==--==--==--#
+   #     ZACKERYRSMITH!     #
+   ##########################
+
+# set mod (super) as win key
+set $mod Mod4
+
+
+#==--       --==#
+# GENERAL SETUP #
+#==--       --==#
+# start XDG autostart .desktop files using dex
+exec --no-startup-id dex --autostart --environment i3
+
+# xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
+# screen before suspend. Use loginctl lock-session to lock your screen.
+exec --no-startup-id xss-lock -l ~/.config/i3/lock.sh
+
+# start polybar (only on startup use mod+shift+p to refresh bar)
+exec --no-startup-id ~/.config/polybar/polybar.sh
+
+# gif background (as it eats ram use mod+shift+a to start and mod+shift+ctrl+a to kill)
+exec --no-startup-id ~/.config/i3/gifbg.sh 0.02 ~/.config/i3/res/raintrain.gif
+
+# start dunst (notification daemon replacement)
+exec --no-startup-id dunst -conf ~/.config/dunst/dunstrc/frappe.conf
+
+
+#==--    --==#
+# NETWORKING #
+#==--    --==#
+# nm-applet is a desktop environment-independent 
+# system tray GUI for NetworkManager
+bindcode $mod+d exec rofi -modi drun,run -show drun
+exec --no-startup-id nm-applet
+
+
+#==-- --==#
+#  AUDIO  #
+#==-- --==#
+# pulseAudio setup
+exec --no-startup-id systemctl enable pulseaudio.service --user
+exec --no-startup-id pulseaudio --start
+
+# use pactl to adjust volume in PulseAudio.
+set $refresh_i3status killall -SIGUSR1 i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
+bindsym XF86AudioMute        exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute     exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+# set volume to 40% to avoid ear rape
+exec --no-startup-id pacmd set-sink-volume 0 26000
+
+# Media player controls
+bindsym XF86AudioPlay exec playerctl play
+bindsym XF86AudioPause exec playerctl pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+
+#==--  --==#
+#  WINDOW  #
+#==--  --==#
+# hide window title bar 
+# https://gist.github.com/lirenlin/9892945?permalink_comment_id=4312849#gistcomment-4312849
+default_border pixel 1
+default_floating_border pixel 1
+for_window [class="^.*"] border pixel 1
+
+# use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# center floating windows when spawned
+for_window [class=".*"] [floating] move absolute position center
+
+# picom for window transparency
+exec --no-startup-id picom -CGb
+
+# i3-gaps
+gaps inner 5
+gaps outer 3
+
+bindsym $mod+z	             gaps outer current plus  1
+bindsym $mod+Shift+z         gaps outer current minus 1
+bindsym $mod+Control+z       gaps inner current plus  1
+bindsym $mod+Control+Shift+z gaps inner current minus 1
+
+# These bindings trigger as soon as you enter the resize mode
+mode "resize" {
+
+        bindsym j         resize shrink width  10 px or 10 ppt
+        bindsym k         resize grow   height 10 px or 10 ppt
+        bindsym l         resize shrink height 10 px or 10 ppt
+        bindsym semicolon resize grow   width  10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left  resize shrink width  10 px or 10 ppt
+        bindsym Down  resize grow   height 10 px or 10 ppt
+        bindsym Up    resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow   width  10 px or 10 ppt
+
+        # return back to normal mode
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+
+
+#==--    --==#
+# WORKSPACES #
+#==--    --==#
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+
+#==--            --==#
+# OTHER KEY BINDINGS #
+#==--            --==#
+# start an alacritty terminal
+bindsym $mod+Return exec alacritty
+
+# restart polybar
+bindsym $mod+Shift+p exec ~/.config/polybar/polybar.sh
+
+# open rofi-playerctl
+bindsym $mod+p exec ~/.config/i3/rofi-playerctl.sh
+
+# kill focused window
+bindsym $mod+Shift+q kill
+
+# kill animated background
+bindsym $mod+Shift+Control+a exec ps -aux | grep gifbg.sh | grep -v grep | awk '{ print $2 }' | xargs kill -9
+
+# start animated background
+bindsym $mod+Shift+a exec ~/.config/i3/gifbg.sh 0.02 ~/.config/i3/res/raintrain.gif
+
+# start rofi (a program launcher)
+bindsym $mod+d exec "rofi -modi drun,run -show drun"
+
+# change focus
+bindsym $mod+j         focus left
+bindsym $mod+k         focus down
+bindsym $mod+l         focus up
+bindsym $mod+semicolon focus right
+
+# alternatively, you can use the arrow keys
+bindsym $mod+Left  focus left
+bindsym $mod+Down  focus down
+bindsym $mod+Up    focus up
+bindsym $mod+Right focus right
+
+# move focused window
+bindsym $mod+Shift+j         move left
+bindsym $mod+Shift+k         move down
+bindsym $mod+Shift+l         move up
+bindsym $mod+Shift+semicolon move right
+
+# alternatively, you can use the arrow keys
+bindsym $mod+Shift+Left  move left
+bindsym $mod+Shift+Down  move down
+bindsym $mod+Shift+Up    move up
+bindsym $mod+Shift+Right move right
+
+# split in horizontal orientation
+bindsym $mod+h split h
+
+# split in vertical orientation
+bindsym $mod+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+a focus parent
+
+# focus the child container
+#bindsym $mod+d focus child
+
+# switch to workspace
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+bindsym $mod+Shift+x exec ~/.config/i3/lock.sh 
+
+# brighness control
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+bindsym $mod+r mode "resize"
+
+
